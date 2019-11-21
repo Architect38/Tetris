@@ -1,2 +1,1 @@
-# Tetris
-React Tetris
+Tetris
