@@ -1,0 +1,15 @@
+.block{
+    border: 1px solid black;
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+.main{
+    border: 1px solid black;
+}
+.emty{
+    background: rgba(26, 24, 24, 0.164);
+}
+.filled{
+    background: blue;
+}
