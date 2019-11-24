@@ -1,15 +1,52 @@
-.block{
+body{
+    /* background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%); */
+}
+.menu{
+   text-align: center; 
+}
+.game{
+    display: grid;
+    grid-template-columns: 17rem 200px;
+    margin:auto;
+    max-width:500px;
+    outline: none;
+
+}
+.stat{
+    margin-left: 20px;
+    
+}
+.stat button{
+    padding: 0.5rem;
+    background: white;
+    cursor: pointer;
+    outline: inherit;
     border: 1px solid black;
+    margin-right: 1rem;
+}
+.stat button:hover{
+    color:white;
+    background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+}
+.map{
+    border: 3px solid black; 
+    padding: 0.3rem;
+    padding-bottom: 0.2rem;
+    text-align: center;
+}
+.map div{
+    margin: -4px;
+}
+.block{
     display: inline-block;
     width: 1.5rem;
     height: 1.5rem;
 }
-.main{
-    border: 1px solid black;
-}
 .emty{
-    background: rgba(26, 24, 24, 0.164);
+    border:1px solid white;
+    background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,0.6643032212885154) 100%);
 }
 .filled{
-    background: blue;
+    background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+    border:1px solid black;
 }

@@ -11,34 +11,37 @@ class App extends React.Component{
     super(props);
     this.state={
       gameMap:[
-        [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-        [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0],       
       ],
       figure: [],
       formsOfFigure: [],
       currenFormIndex:0,
       x: 1,
-      y: 1,
+      y: 0,
+      pressMoveFigure: true,
+      score:0,
+      menu: false,
+      pause: true,
     }
+    this.timePlay = null;
+    this.myDiv = React.createRef();
     this.drawingMap = this.drawingMap.bind(this);
     this.drawingFigureOnMap = this.drawingFigureOnMap.bind(this);
     this.moveFigure = this.moveFigure.bind(this);
@@ -47,15 +50,26 @@ class App extends React.Component{
     this.clear = this.clear.bind(this);
     this.changeForm = this.changeForm.bind(this);
     this.check = this.check.bind(this);
+    this.finish = this.finish.bind(this);
+    this.drawMenu = this.drawMenu.bind(this);
   }
   check(way){
     let [x,y] = [this.state.x,this.state.y];
     let [column, rows] = [this.state.figure[0].length, this.state.figure.length];
+    let [columnMap, rowsMap] = [this.state.gameMap[0].length, this.state.gameMap.length];
+    let gameMap = this.state.gameMap;
+    
+    for (let i=y; i<rows+y; i++){
+      for (let j=x; j<column+x; j++){
+        if (y===0&&gameMap[i][j]===2) this.finish();
+      }
+    }
+
     if (way==="ArrowRight"){
       x=x+1;
       for (let i=y; i<rows+y; i++){
         for (let j=x; j<column+x; j++){
-          if (this.state.gameMap[i][j]===2&&this.state.gameMap[i][j-1]===1) return false;
+          if ((j===columnMap||gameMap[i][j]===2)&&gameMap[i][j-1]===1) return false;
         }
       }
     }
@@ -63,7 +77,7 @@ class App extends React.Component{
       x=x-1;
       for (let i=y; i<rows+y; i++){
         for (let j=x; j<column+x; j++){
-          if (this.state.gameMap[i][j]===2&&this.state.gameMap[i][j+1]===1)  return false;
+          if ((j===-1||gameMap[i][j]===2)&&gameMap[i][j+1]===1) return false;
         }
       }
     }
@@ -73,9 +87,10 @@ class App extends React.Component{
       if (i<l-1) i++
       else i=0;
       let [column, rows] = [this.state.formsOfFigure[i][0].length,this.state.formsOfFigure[i].length];
+      
       for (let i=y; i<rows+y; i++){
         for (let j=x; j<column+x; j++){
-          if (this.state.gameMap[i][j]===2) return false;
+          if (i===rowsMap||j===columnMap||gameMap[i][j]===2) return false;
         }
       }
     }
@@ -83,11 +98,29 @@ class App extends React.Component{
       y=y+1;
       for (let i=y; i<rows+y; i++){
         for (let j=x; j<column+x; j++){
-          if (this.state.figure[i-y][j-x]===1&&this.state.gameMap[i][j]===2) return false
+          if (this.state.figure[i-y][j-x]===1&&(i===rowsMap||gameMap[i][j]===2)) return false
         }
       }
     }
     return true;
+  }
+  finish(){
+    clearInterval(this.timePlay);
+    alert("Game over!");
+    this.setState({
+      pressMoveFigure: false,
+      score: 0,
+      y: 0,
+      x: 4
+    });
+    this.state.gameMap.forEach((item,i,arr)=>{
+      arr[i].forEach((item,i,arr)=>{
+        arr[i]=0;
+      });
+    });
+    this.getFigure();
+    this.timePlay = setInterval(()=>this.moveFigure({key:"ArrowDown"}),1000);
+    this.setState({pressMoveFigure: true});
   }
   changeForm(){
     let i = this.state.currenFormIndex;
@@ -132,8 +165,8 @@ class App extends React.Component{
       this.setState({gameMap: this.state.gameMap});
   }
   getFigure(){
-    let r = 2 //Math.trunc(Math.random() * (Object.keys(items).length - 1));
-    let formIndex = 1 //Math.trunc(Math.random() * (Object.keys(items[r]).length - 1));
+    let r = 5//Math.trunc(Math.random() * (Object.keys(items).length));
+    let formIndex = Math.trunc(Math.random() * (Object.keys(items[r]).length - 1));
     let arr=[];
     for(let key in items[r]){
       arr.push(items[r][key]);
@@ -142,25 +175,7 @@ class App extends React.Component{
     this.setState({currenFormIndex: formIndex});
     this.setState({figure: arr[formIndex]},()=>{this.drawingFigureOnMap();});
   }
-  drawingMap(){
-    return this.state.gameMap.map((item,i)=>{
-      return (
-        <div key={`y=${i}`}>
-          {item.map((item,j)=>{
-            return (
-              <span className={
-                  item===0
-                    ?"block emty"
-                    :"block filled"
-              } key={`x=${j}`}>
-                {item}
-              </span>
-            )
-          })}
-        </div>
-      )
-    });
-  }
+  
   drawingFigureOnMap(){
     let [x,y] = [this.state.x,this.state.y];
     let [column, rows] = [this.state.figure[0].length, this.state.figure.length];
@@ -201,24 +216,88 @@ class App extends React.Component{
               this.drawingFigureOnMap();
               this.clear("ArrowDown");
             })
-          }
+          } else this.changeFigure();
           break;
       default: break;
     }
     
   }
   changeFigure(){
-    let r = Math.trunc(Math.random() * (items.length - 1));
-    this.setState({figure:items[r].type_1},this.drawingFigureOnMap)
+    let [x,y] = [this.state.x,this.state.y];
+    let [column, rows] = [this.state.figure[0].length, this.state.figure.length];
+    let [columnMap, rowsMap] = [this.state.gameMap[0].length, this.state.gameMap.length];
+    let [gameMap,figure] = [this.state.gameMap, this.state.figure];
+    let countFilled = 0;
+    clearInterval(this.timePlay);
+    this.setState({pressMoveFigure: false});
+  
+    for (let i=y; i<rows+y; i++){  //слияние
+      for (let j=x; j<column+x; j++){
+        if (figure[i-y][j-x]===1) gameMap[i][j]=2;
+      }
+    }
+    for(let i=0; i<rowsMap; i++){ //чистка
+      countFilled = 0;
+      gameMap[i].forEach((item)=>item===2 && countFilled++);
+      if (countFilled===columnMap){
+        this.setState({score: this.state.score+10});
+        for (let j=i;j>0;j--){
+          for(let j2=0;j2<columnMap;j2++){
+            gameMap[j][j2]=gameMap[j-1][j2];
+          }
+        }
+      }
+    }
+    this.setState({pressMoveFigure: true});
+    this.state.y=0;
+    this.state.x=4;
+    this.getFigure();
+    this.timePlay = setInterval(()=>this.moveFigure({key:"ArrowDown"}),1000);
+  }
+  drawMenu(){
+
+  }
+  drawingMap(){
+    return this.state.gameMap.map((item,i)=>{
+      return (
+        <div key={`y=${i}`}>
+          {item.map((item,j,arr)=>{
+            return (
+              <span className={
+                  item===0
+                    ?"block emty"
+                    :"block filled"
+              } key={`x=${j}`}>
+                
+              </span>
+            )
+          })}
+        </div>
+      )
+    });
   }
   componentDidMount(){
+    this.myDiv.current.focus();
     this.getFigure();
-    //setInterval(this.changeFigure,1000);
+    this.timePlay = setInterval(()=>this.moveFigure({key:"ArrowDown"}),1000);
   }
   render(){
     return (
-      <div onKeyDown={this.moveFigure} tabIndex="0" className="main">
-          {this.drawingMap()} 
+      <div className="main">
+       {
+         this.state.menu===true
+           ? <div className="menu">
+                
+             </div>
+           : <div onKeyDown={this.state.pressMoveFigure===true && this.moveFigure} ref={this.myDiv}tabIndex="-1" className="game">
+               <div className="map">{this.drawingMap()}</div>
+               <div className="stat">
+                  <h2>Score: {this.state.score}</h2>
+                  <button>Pause</button>
+                  <button>New game</button>
+               </div>
+             </div>
+       }
       </div>
     );
   }
