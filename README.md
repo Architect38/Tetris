@@ -1,2 +1,2 @@
-react2
+react22
 Tetris
