@@ -1,29 +1,7 @@
 import React from 'react';
 import  './App.css';
 import items from './items';
-
-
-class ScoreInc extends React.Component{
-  constructor(props){
-    super(props);
-    this.state={
-      opacity:1
-    }
-  }
-  componentDidMount(){
-    this.interval = setInterval(()=>{
-      this.setState({opacity: this.state.opacity-0.05})
-    },100)
-  }
-  componentWillUnmount(){
-    clearInterval(this.interval);
-  }
-  render(){
-    return(
-      <div className="scoreInc" style={{opacity:`${this.state.opacity}`}}>+{this.props.scoreInc}</div>
-    );
-  }
-}
+import ScoreInc from './ScoreInc.js'
 
 
 class App extends React.Component{
@@ -53,6 +31,9 @@ class App extends React.Component{
       figure: [],
       formsOfFigure: [],
       currenFormIndex:0,
+      nextFigure: [],
+      nextFormOfFigure: [],
+      nextFormIndex: 0,
       x: 1,
       y: 0,
       pressMoveFigure: true,
@@ -79,6 +60,7 @@ class App extends React.Component{
     this.finish = this.finish.bind(this);
     this.drawMenu = this.drawMenu.bind(this);
     this.speedChange = this.speedChange.bind(this);
+    this.drawingNext = this.drawingNext.bind(this);
     this.newGame = this.newGame.bind(this);
   }
   drawMenu(){
@@ -148,10 +130,10 @@ class App extends React.Component{
         arr[i]=0;
       });
     });
-    
     this.setState({pressMoveFigure: true,gameOver:false,y:0,x:4,score:0},()=>{
       this.getFigure();
-      //this.timePlay = setInterval(()=>this.moveFigure({key:"ArrowDown"}),this.state.speed);
+      clearInterval(this.timePlay)
+      this.timePlay = setInterval(()=>this.moveFigure({key:"ArrowDown"}),this.state.speed);
       this.myDiv.current.focus();
     });
   }
@@ -204,11 +186,16 @@ class App extends React.Component{
     for(let key in items[r]){
       arr.push(items[r][key]);
     }
-    this.setState({formsOfFigure: arr});
-    this.setState({currenFormIndex: formIndex});
-    this.setState({figure: arr[formIndex]},()=>{this.drawingFigureOnMap();});
+    this.setState({
+      figure: this.state.nextFigure,
+      formsOfFigure: this.state.nextFormOfFigure,
+      formIndex: this.state.nextFormIndex
+    },()=>{this.setState({
+      nextFigure: arr[formIndex],
+      nextFormIndex: formIndex,
+      nextFormOfFigure: arr
+    })});  
   }
-  
   drawingFigureOnMap(){
     let [x,y] = [this.state.x,this.state.y];
     let [column, rows] = [this.state.figure[0].length, this.state.figure.length];
@@ -222,6 +209,7 @@ class App extends React.Component{
   moveFigure(e){
     let x = this.state.x;
     let y = this.state.y;
+    this.state.gameOver===false && this.myDiv.current.focus();
     switch(e.key){
       case "ArrowRight":
         this.check("ArrowRight")===true
@@ -311,6 +299,24 @@ class App extends React.Component{
       )
     });
   }
+  drawingNext(){
+    return this.state.nextFigure.map((item,i)=>{
+      return (
+        <div key={`y=${i}`} style={{margin:"-4px", "text-align":"center"}}>
+          {item.map((item,j,arr)=>{
+            return (
+              <span className={
+                  item===0
+                    ?"block"
+                    :"block filled"
+              } key={`x=${j}`}>
+              </span>
+            )
+          })}
+        </div>
+      )
+    });
+  }
   pressPause(){
     this.setState({pause:this.state.pause===true?false:true},()=>{
       if(this.state.pause===true){
@@ -332,9 +338,21 @@ class App extends React.Component{
     });
   }
   componentDidMount(){
-    this.myDiv.current.focus();
-    this.getFigure();
-    this.timePlay = setInterval(()=>this.moveFigure({key:"ArrowDown"}),this.state.speed);
+    let r = Math.trunc(Math.random() * (Object.keys(items).length));
+    let formIndex = Math.trunc(Math.random() * (Object.keys(items[r]).length - 1));
+    let arr=[];
+    for(let key in items[r]){
+      arr.push(items[r][key]);
+    }
+    this.setState({
+      nextFigure: arr[formIndex],
+      nextFormIndex: formIndex,
+      nextFormOfFigure: arr
+    },()=>{
+      this.getFigure();
+      this.timePlay = setInterval(()=>this.moveFigure({key:"ArrowDown"}),this.state.speed);
+      this.myDiv.current.focus();
+    });
   }
   render(){
     return (
@@ -353,13 +371,15 @@ class App extends React.Component{
                     {this.state.pause===true && <img className = "pause" src="/pause.png"/>}
               </div>
               <div className="stat">
-                  <h2>Score: {this.state.score}</h2>
+                  <h1>Score: {this.state.score}</h1>
+                  <div className="nextFigure"><p>Next figure:</p> {this.drawingNext()}</div>
+                  <div className="currentSpeed">
+                    <p>Current speed: {this.state.speed===1000?1+"s":this.state.speed+"ms"}</p>
+                    <input type="range" onKeyPress={()=>{return false}} min="0" max="950"  className="slider" value={this.state.currentSpeedRange} ref={this.rangeSpeed} onChange={this.speedChange}></input>
+                  </div>
                   <button onClick={this.pressPause}>
                     {this.state.pause===false?"Pause":"Resume"}
                   </button>
-                  <p>Current speed:{this.state.speed===1000?1+"s":this.state.speed+"ms"}</p>
-                  <input type="range" min="0" max="950"  className="slider" value={this.state.currentSpeedRange} ref={this.rangeSpeed} onChange={this.speedChange}></input>
-                  
               </div>
              </div>
        }
