@@ -6,6 +6,11 @@
       "src": "videogame.png",
       "sizes": "64x64",
       "type": "image"
+    },
+    {
+      "src": "pause.png",
+      "sizes": "64x64",
+      "type": "image"
     }
   ],
   "start_url": ".",
