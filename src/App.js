@@ -368,7 +368,7 @@ class App extends React.Component{
               <div className="map" style={this.state.pause===true?{opacity:"0.4"}:{}}>
                     {this.drawingMap()}
                     {this.state.scoreInc>0 && <ScoreInc scoreInc={this.state.scoreInc}/>}
-                    {this.state.pause===true && <img className = "pause" src="/pause.png"/>}
+                    {this.state.pause===true && <img className = "pause" src="pause.png"/>}
               </div>
               <div className="stat">
                   <h1>Score: {this.state.score}</h1>
