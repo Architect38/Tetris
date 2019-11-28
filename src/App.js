@@ -58,13 +58,9 @@ class App extends React.Component{
     this.check = this.check.bind(this);
     this.pressPause = this.pressPause.bind(this);
     this.finish = this.finish.bind(this);
-    this.drawMenu = this.drawMenu.bind(this);
     this.speedChange = this.speedChange.bind(this);
     this.drawingNext = this.drawingNext.bind(this);
     this.newGame = this.newGame.bind(this);
-  }
-  drawMenu(){
-
   }
   check(way){
     let [x,y] = [this.state.x,this.state.y];
